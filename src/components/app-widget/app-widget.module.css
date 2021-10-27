@@ -1,0 +1,23 @@
+
+.widgetHeader {
+    padding-top: .5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.widgetTitle {
+    font-size: 1.125rem;
+    /*padding-right: 1rem;*/
+    display: flex;
+    font-weight: 500;
+    align-items: center;
+}
+
+.widgetContent {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-bottom: .5rem;
+    padding-top: .5rem;
+    /*width: fit-content !important;
+    border: 1px solid pink;*/
+}

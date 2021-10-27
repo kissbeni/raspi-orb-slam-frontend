@@ -1,0 +1,46 @@
+
+.value {
+    font-size: 2em;
+    font-weight: 500;
+    font-family: 'DM Mono', monospace;
+    display: flex;
+    align-items: end;
+}
+
+.units {
+    font-size: .825rem;
+    margin-left: .2rem;
+    display: flex;
+    align-items: end;
+    padding-bottom: .4rem;
+}
+
+.mainStatArea {
+    display: block;
+}
+
+.mainStatArea > span {
+    display: inline;
+}
+
+.extraStats {
+    display: block;
+}
+
+.extraStats > span {
+    display: inline-block;
+}
+
+.extraStats > span::after {
+    content: '/';
+    margin-left: .2rem;
+    margin-right: .2rem;
+    /*font-size: 1.2rem;*/
+    font-weight: 600;
+    display: inline-block;
+}
+
+.extraStats > span:last-child::after {
+    margin-left: 0;
+    display: none;
+}
