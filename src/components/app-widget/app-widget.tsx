@@ -9,7 +9,7 @@ export type AppWidgetParams = {
 
 export const AppWidget = (params: AppWidgetParams) => {
   return (
-    <Paper>
+    <Paper className={classes.root}>
       <Grid container direction="column">
         <Grid item className={classes.widgetHeader}>
           <span className={classes.widgetTitle}>{params.title}</span>
