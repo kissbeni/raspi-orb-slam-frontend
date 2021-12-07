@@ -3,7 +3,7 @@ import AppWidget from '../../app-widget/app-widget';
 import classes from './stat-widget.module.css';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 
-export type NumberWidgetParams = {
+export type StatWidgetParams = {
   title: string;
   value: number | string;
   min?: number;
@@ -14,7 +14,7 @@ export type NumberWidgetParams = {
   showChartIcon?: boolean;
 };
 
-export const NumberWidget = (params: NumberWidgetParams) => {
+export const StatWidget = (params: StatWidgetParams) => {
   return (
     <AppWidget title={params.title}>
       <Grid container direction="row" spacing={2}>
@@ -56,4 +56,4 @@ export const NumberWidget = (params: NumberWidgetParams) => {
   );
 };
 
-export default NumberWidget;
+export default StatWidget;
