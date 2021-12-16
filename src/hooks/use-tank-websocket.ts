@@ -1,8 +1,19 @@
 /* eslint-disable indent */
 import { useEffect, useMemo, useState } from 'react';
-import { createNumericStat, NumericStat, updateNumericStatState } from '../common/common-types';
+import {
+  createNumericStat,
+  NumericStat,
+  Point3D,
+  TrackedPoint,
+  updateNumericStatState,
+} from '../common/common-types';
 import { DeserializerStream } from '../protocol/deserializer-stream';
-import { deserializeMetricsPacket, PacketType } from '../protocol/tank-packets';
+import {
+  deserializeMetricsPacket,
+  deserializePathPacket,
+  deserializeReportPacket,
+  PacketType,
+} from '../protocol/tank-packets';
 
 export interface TankWebSocket {
   fps: NumericStat;
@@ -10,6 +21,9 @@ export interface TankWebSocket {
   memUsage: NumericStat;
   featureCount: NumericStat;
   systemStatus: string;
+  overlayPoints: TrackedPoint[];
+  cameraTrajectory: Point3D[];
+  worldPoints: Point3D[];
 }
 
 const TrackingStateToStringMap: Record<number, string> = {
@@ -20,23 +34,41 @@ const TrackingStateToStringMap: Record<number, string> = {
   [3]: 'Running, Lost',
 };
 
+type ExtendedWindowType = Window & {
+  reconnectTimer?: NodeJS.Timeout;
+};
+
 export const useTankWebsocket = (url: string): TankWebSocket => {
   const [fps, setFps] = useState(createNumericStat());
   const [cpuUsage, setCpuUsage] = useState(createNumericStat());
   const [memUsage, setMemUsage] = useState(createNumericStat());
   const [featureCount, setFeatureCount] = useState(createNumericStat());
   const [systemStatus, setSystemStatus] = useState('Disconnected');
+  const [overlayPoints, setOverlayPoints] = useState<TrackedPoint[]>([]);
+  const [cameraTrajectory, setCameraTrajectory] = useState<Point3D[]>([]);
+  const [worldPoints, setWorldPoints] = useState<Point3D[]>([]);
   const [wsReconnect, setWsReconnect] = useState(0);
 
   useEffect(() => {
     console.log('Websocket start', url, wsReconnect);
     const ws = new WebSocket(url);
     ws.onopen = () => {
-      setSystemStatus('Connected');
+      setSystemStatus('Waiting for telemetry');
     };
     ws.onclose = () => {
-      setTimeout(() => setWsReconnect((x) => x + 1), 10000);
+      const _window = window as unknown as ExtendedWindowType;
+      if (_window.reconnectTimer) {
+        clearTimeout(_window.reconnectTimer);
+      }
+      _window.reconnectTimer = setTimeout(() => setWsReconnect((x) => x + 1), 10000);
       setSystemStatus('Disconnected');
+      setFps(createNumericStat());
+      setCpuUsage(createNumericStat());
+      setMemUsage(createNumericStat());
+      setFeatureCount(createNumericStat());
+      setOverlayPoints([]);
+      setCameraTrajectory([]);
+      setWorldPoints([]);
     };
     ws.onerror = () => {
       setSystemStatus('Protocol error');
@@ -55,6 +87,19 @@ export const useTankWebsocket = (url: string): TankWebSocket => {
           );
           break;
         }
+        case PacketType.OPUD: {
+          const pkt = deserializeReportPacket(ds);
+          setOverlayPoints(pkt.overlay);
+          setWorldPoints(pkt.worldPoints);
+          updateNumericStatState(pkt.overlay.length, setFeatureCount);
+          break;
+        }
+        case PacketType.CPUD: {
+          const pkt = deserializePathPacket(ds);
+          console.log('trajectory packet', pkt.currentCameraPos, pkt.index);
+          setCameraTrajectory((prev) => [...prev, pkt.currentCameraPos]);
+          break;
+        }
       }
     };
 
@@ -67,5 +112,8 @@ export const useTankWebsocket = (url: string): TankWebSocket => {
     memUsage,
     featureCount,
     systemStatus,
+    overlayPoints,
+    cameraTrajectory,
+    worldPoints,
   };
 };

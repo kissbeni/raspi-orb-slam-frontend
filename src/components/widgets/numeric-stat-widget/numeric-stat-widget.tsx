@@ -6,7 +6,8 @@ export type NumericStatWidgetParams = {
   title: string;
   stat: NumericStat;
   units?: string;
-  showChartIcon?: boolean;
+  shownOnGraph?: boolean;
+  onShowOnGraph?: () => void;
 };
 
 export const NumericStatWidget = (params: NumericStatWidgetParams) => {
@@ -17,6 +18,10 @@ export const NumericStatWidget = (params: NumericStatWidgetParams) => {
       avg={params.stat.avg}
       min={params.stat.min}
       max={params.stat.max}
+      onSave={() => {
+        const myWindow = window.open('', 'MsgWindow', 'width=200,height=100');
+        myWindow?.document.write(JSON.stringify(params.stat));
+      }}
     />
   );
 };
