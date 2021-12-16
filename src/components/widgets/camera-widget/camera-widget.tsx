@@ -1,11 +1,13 @@
 import classes from './camera-widget.module.css';
 import { CircularProgress } from '@mui/material';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import AppWidget from '../../app-widget/app-widget';
 import CenteringBox from '../../centering-box/centering-box';
+import { TrackedPoint } from '../../../common/common-types';
 
 export type CameraWidgetParams = {
   streamUrl: string;
+  trackedPoints: TrackedPoint[];
 };
 
 type ExtendedWindowType = Window & {
@@ -51,6 +53,15 @@ export const CameraWidget = (params: CameraWidgetParams) => {
         onLoad={handleImageUpdate}
         width="640"
       />
+      <svg
+        className={`${loading ? classes.hideStream : ''} ${classes.pointOverlayCanvas}`}
+        width="640"
+        height="480"
+      >
+        {params.trackedPoints.map((x, i) => (
+          <rect key={i} width="4" height="4" fill="#00ffff" x={x.x} y={x.y}></rect>
+        ))}
+      </svg>
     </AppWidget>
   );
 };
