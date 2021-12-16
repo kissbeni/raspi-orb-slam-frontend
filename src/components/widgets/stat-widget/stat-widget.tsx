@@ -2,6 +2,7 @@ import { Grid, IconButton, Tooltip } from '@mui/material';
 import AppWidget from '../../app-widget/app-widget';
 import classes from './stat-widget.module.css';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
+import { SaveAlt } from '@mui/icons-material';
 
 export type StatWidgetParams = {
   title: string;
@@ -11,7 +12,9 @@ export type StatWidgetParams = {
   avg?: number;
   extraInfo?: string;
   units?: string;
-  showChartIcon?: boolean;
+  shownOnGraph?: boolean;
+  onShowOnGraph?: () => void;
+  onSave?: () => void;
 };
 
 export const StatWidget = (params: StatWidgetParams) => {
@@ -42,11 +45,20 @@ export const StatWidget = (params: StatWidgetParams) => {
             {params.extraInfo && <span>{params.extraInfo}</span>}
           </Grid>
         </Grid>
-        {params.showChartIcon && (
+        {params.onShowOnGraph && (
           <Grid item display="flex" alignItems="end">
             <Tooltip title="Show history">
-              <IconButton>
-                <ShowChartIcon />
+              <IconButton onClick={params.onShowOnGraph}>
+                <ShowChartIcon htmlColor={params.shownOnGraph ? '#14af46' : '#333'} />
+              </IconButton>
+            </Tooltip>
+          </Grid>
+        )}
+        {params.onSave && (
+          <Grid item display="flex" alignItems="end">
+            <Tooltip title="Export">
+              <IconButton onClick={params.onSave}>
+                <SaveAlt />
               </IconButton>
             </Tooltip>
           </Grid>
